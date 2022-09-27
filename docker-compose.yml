@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  users-service:
+    build:
+      context: ./users-service
+      dockerfile: Dockerfile
+    image: users-services-image
+    ports:
+      - "4000:4000"
+    container_name: users-services-container
+    environment:
+      - PORT=$PORT
+      - MONGODB_URL=$MONGODB_URL
+    volumes:
+      - ./users-service/:/app:ro
+      - /app/node_modules
