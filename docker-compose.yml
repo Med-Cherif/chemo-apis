@@ -1,6 +1,30 @@
 version: '3.8'
 
 services:
+
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    container_name: zookeeper
+    ports:
+      - '2181:2181'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+  kafka:
+    image: 'bitnami/kafka:latest'
+    container_name: kafka
+    ports:
+      - '9092:9092'
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    depends_on:
+      - zookeeper
+    volumes:
+      - ./kafka/var/run/docker.sock:/var/run/docker.sock
+      
   users-service:
     build:
       context: ./users-service
@@ -10,8 +34,27 @@ services:
       - "4000:4000"
     container_name: users-services-container
     environment:
-      - PORT=$PORT
-      - MONGODB_URL=$MONGODB_URL
+      - PORT=$USERS_SERVICE_PORT
+      - MONGODB_URL=$USERS_SERVICE_MONGODB_URL
+      - JWT_ACCESS_TOKEN_SECRET=$JWT_ACCESS_TOKEN_SECRET
+      - JWT_REFRESH_TOKEN_SECRET=$JWT_REFRESH_TOKEN_SECRET
     volumes:
       - ./users-service/:/app:ro
+      - /app/node_modules
+
+      
+  emailing-service:
+    build:
+      context: ./emailing-service
+      dockerfile: Dockerfile
+    image: emailing-services-image
+    ports:
+      - "6000:6000"
+    container_name: emailing-service-container
+    environment:
+      - PORT=$EMAILING_SERVICE_PORT
+      - EMAILING_SERVICE_EMAIL=$EMAILING_SERVICE_EMAIL
+      - EMAILING_SERVICE_PASS=$EMAILING_SERVICE_PASS
+    volumes:
+      - ./emailing-service/:/app:ro
       - /app/node_modules

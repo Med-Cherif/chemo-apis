@@ -12,6 +12,27 @@ const schema = new Schema({
         required: true,
         trim: true
     },
+    isVerified: {
+        type: Boolean,
+        default: false,
+    },
+    role: {
+        type: String,
+        enum: ['USER', 'ADMIN', 'SUPER_ADMIN'],
+        default: 'USER',
+    },
+    followings: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    followers: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    blockingUsers: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
     email: {
         type: String,
         required: true,
@@ -19,13 +40,13 @@ const schema = new Schema({
         unique: true
     },
     birthday: {
-        type: String,
+        type: Date,
         required: true
     },
     gender: {
         type: String,
-        required: true,
-        enum: ['MALE', 'FEMALE']
+        default: 'PREFER_NOT_TO_SAY',
+        enum: ['MALE', 'FEMALE', 'PREFER_NOT_TO_SAY']
     },
     password: {
         type: String,

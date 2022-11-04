@@ -6,9 +6,10 @@ const app = express();
 app.use(cors());
 app.use(express.json())
 
-app.get('/', (_, res) => {
+app.get('/', (req, res) => {
     res.send({
-        "message": "Hello world"
+        "IP": req.ip,
+        "IPS": req.ips,
     })
 })
 

@@ -2,8 +2,8 @@ import http from "http";
 import { ApolloServer } from "apollo-server-express";
 import { ApolloServerPluginDrainHttpServer, ApolloServerPluginLandingPageLocalDefault } from "apollo-server-core"
 import app from "./app";
-import resolvers from "./gql/resolvers";
-import typeDefs from "./gql/typeDefs";
+import resolvers from "./graphql/resolvers";
+import typeDefs from "./graphql/typeDefs";
 import connectDB from "./db/connectDB";
 
 const runApp = async () => {
@@ -16,6 +16,11 @@ const runApp = async () => {
             resolvers,
             cache: 'bounded',
             csrfPrevention: true,
+            context: ({ req }) => {
+                return {
+                    req
+                }
+            },
             plugins: [
                 ApolloServerPluginDrainHttpServer({ httpServer }),
                 ApolloServerPluginLandingPageLocalDefault({ embed: true })
@@ -24,7 +29,13 @@ const runApp = async () => {
 
         await connectDB();
         await apolloServer.start()
-        apolloServer.applyMiddleware({ app, path: '/graphql' })
+        apolloServer.applyMiddleware({ 
+            app, 
+            path: '/graphql',
+            cors: {
+                origin: "*"
+            }
+        })
 
         const PORT = process.env.PORT || 4000;
 

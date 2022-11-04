@@ -1,4 +1,4 @@
-import { isValidUsername, isValidEmail, isValidGender, isValidName, isValidPassword, isValidBirthday } from "../validation/UserValidation"
+import { isValidUsername, isValidEmail, isValidGender, isValidName, isValidPassword, isValidBirthday, isConfirmedPassword } from "../validation/UserValidation"
 
 describe('user validation', () => {
     
@@ -41,7 +41,16 @@ describe('user validation', () => {
         expect(isValidBirthday('2021-13-25')).toBeFalsy();
         expect(isValidBirthday('2021-12-32')).toBeFalsy();
         expect(isValidBirthday('2021-02-30')).toBeFalsy();
-        
+        expect(isValidBirthday('2001-03-25')).toBeTruthy();
+
+        expect(isValidBirthday('2001-02-29')).toBeFalsy();
+        expect(isValidBirthday('2001-02-28')).toBeTruthy();
+        expect(isValidBirthday('2000-02-29')).toBeTruthy();
+    })
+
+    it('should return true if confirm password matches password', () => {
+        expect(isConfirmedPassword('password', 'password')).toBeTruthy();
+        expect(isConfirmedPassword('password', 'password-')).toBeFalsy();
     })
 
 })
